@@ -2,7 +2,7 @@ import { Matrix, string, typeOf } from 'mathjs';
 import React, { ChangeEvent, Component, createRef, KeyboardEvent, RefObject } from 'react';
 import './Entry.scss';
 import { ExpressionItem, VariableMap } from '../utils/types';
-import MatrixRenderer from './MatrixRenderer';
+import { MathJax } from 'better-react-mathjax';
 
 interface EntryProps {
   variableMap: VariableMap;
@@ -94,6 +94,21 @@ export default class Entry extends Component<EntryProps, {}> {
     this.props.setFocus(this.props.idx);
   }
 
+  private getMatrixTex(m: Matrix) {
+    let res = '\\left[ \\begin{array}';
+    if (m.size().length === 1) {
+      res += '{' + 'c'.repeat(m.size()[0]) + '} ';
+      res += m.toArray().map(x => x.toString()).join(' & ')
+    } else {
+      res += '{' + 'c'.repeat(m.size()[1]) + '} ';
+      res += m.toArray().map(
+        r => (r as number[]).map(x => x.toString()).join('&')
+      ).join('\\\\');
+    }
+    res += ' \\end{array} \\right]';
+    return res;
+  }
+
   public render() {
     const { expressionItem } = this.props;
     const { value, expression } = expressionItem;
@@ -105,9 +120,11 @@ export default class Entry extends Component<EntryProps, {}> {
       valueRender = '[oops]';
     } else {
       valueRender = typeOf(expressionItem.value) === 'Matrix'
-        ? <MatrixRenderer matrix={value as Matrix} />
+        // ? <MatrixRenderer matrix={value as Matrix} />
+        ? this.getMatrixTex(expressionItem.value as Matrix)
         : string(expressionItem.value);
     }
+    console.log(valueRender);
 
     return (
       <div className='entry'>
@@ -119,7 +136,11 @@ export default class Entry extends Component<EntryProps, {}> {
           onFocus={this.onFocus}
           ref={this.inputRef}
         />
-        <div className='expression-value'>{valueRender}</div>
+        <div className='expression-value'>
+          <MathJax>
+            {'\\( ' + valueRender + ' \\)'}
+          </MathJax>
+        </div>
       </div>
     );
   }

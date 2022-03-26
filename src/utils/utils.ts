@@ -19,7 +19,10 @@ export function expressionsAreEqual(e1: ExpressionItem, e2: ExpressionItem): boo
   if (e1.value === null || e2.value === null) {
     if (e1.value !== e2.value) return false;
   } else {
-    if (!equal(e1.value, e2.value)) return false;
+    const [type1, type2] = [typeOf(e1.value), typeOf(e2.value)];
+    if (type1 !== type2) return false;
+    if (type1 === 'Unit')
+      if (!equal(e1.value, e2.value)) return false;
   }
   if (e1.text !== e2.text) return false;
   if (e1.isVariable !== e2.isVariable) return false;
