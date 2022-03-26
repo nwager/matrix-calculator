@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/matrix-calculator/static/css/main.faf786d5.css",
+    "main.js": "/matrix-calculator/static/js/main.86a2fe94.js",
+    "static/js/787.3bbcf017.chunk.js": "/matrix-calculator/static/js/787.3bbcf017.chunk.js",
+    "index.html": "/matrix-calculator/index.html",
+    "main.faf786d5.css.map": "/matrix-calculator/static/css/main.faf786d5.css.map",
+    "main.86a2fe94.js.map": "/matrix-calculator/static/js/main.86a2fe94.js.map",
+    "787.3bbcf017.chunk.js.map": "/matrix-calculator/static/js/787.3bbcf017.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.faf786d5.css",
+    "static/js/main.86a2fe94.js"
+  ]
+}
