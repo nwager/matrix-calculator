@@ -1,6 +1,19 @@
 .entry {
   display: flex;
   flex-direction: row; // unnecessary, but for clarity
-  gap: 1em;
+  justify-content: flex-end;
+  align-items: stretch;
   padding: 0.6em 0;
+  width: 100%;
+
+  input {
+    width: 100%;
+    min-height: 4em;
+    height: 100%;
+    border: none;
+
+    &:focus {
+      border: solid 2px red;
+    }
+  }
 }

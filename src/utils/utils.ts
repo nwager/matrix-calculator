@@ -41,10 +41,13 @@ export function safeEvaluate(expression: string, scope: VariableMap): Result | n
   let val: Result | null = null;
   try {
     val = evaluate(expression, scope);
-    if (typeOf(val) === 'Matrix') {
+    const valType = typeOf(val);
+    if (valType === 'Matrix') {
       let containsNull = false;
       (val as Matrix).forEach(x => containsNull = x === null);
       if (containsNull) return null;
+    } else if (valType !== 'number') {
+      return null;
     }
   } catch (error) {
     // console.error(error);

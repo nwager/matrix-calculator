@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './ExpressionRenderer.scss';
 import { ExpressionItem, Result, VariableMap } from '../utils/types';
 import { EMPTY_EXPRESSION, expressionsAreEqual, safeEvaluate } from '../utils/utils';
 import Entry from './Entry';

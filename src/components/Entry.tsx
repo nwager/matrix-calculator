@@ -1,8 +1,9 @@
-import { Matrix, string, typeOf } from 'mathjs';
+import { Matrix, round, string, typeOf } from 'mathjs';
 import React, { ChangeEvent, Component, createRef, KeyboardEvent, RefObject } from 'react';
 import './Entry.scss';
 import { ExpressionItem, VariableMap } from '../utils/types';
 import { MathJax } from 'better-react-mathjax';
+import { EditableMathField, MathField, MathFieldConfig } from 'react-mathquill';
 
 interface EntryProps {
   variableMap: VariableMap;
@@ -15,15 +16,22 @@ interface EntryProps {
   expressionDeleted: (idx: number) => void;
 }
 
-export default class Entry extends Component<EntryProps, {}> {
+interface EntryState {
+  currentText: string;
+  latex: string;
+}
+
+export default class Entry extends Component<EntryProps, EntryState> {
   private previousText: string = '';
   private inputRef: RefObject<HTMLInputElement>;
+  private mathFieldRef: MathField | null = null;
 
   constructor(props: any) {
     super(props);
     this.inputRef = createRef<HTMLInputElement>();
     this.state = {
       currentText: this.props.expressionItem.text,
+      latex: '',
     };
   }
 
@@ -95,18 +103,22 @@ export default class Entry extends Component<EntryProps, {}> {
   }
 
   private getMatrixTex(m: Matrix) {
-    let res = '\\left[ \\begin{array}';
+    let res = '\\left[\\begin{array}';
     if (m.size().length === 1) {
-      res += '{' + 'c'.repeat(m.size()[0]) + '} ';
-      res += m.toArray().map(x => x.toString()).join(' & ')
+      res += '{' + 'c'.repeat(m.size()[0]) + '}';
+      res += m.toArray().map(x => x.toString()).join('&')
     } else {
-      res += '{' + 'c'.repeat(m.size()[1]) + '} ';
+      res += '{' + 'c'.repeat(m.size()[1]) + '}';
       res += m.toArray().map(
         r => (r as number[]).map(x => x.toString()).join('&')
       ).join('\\\\');
     }
-    res += ' \\end{array} \\right]';
+    res += '\\end{array}\\right]';
     return res;
+  }
+
+  private setMathFieldRef = (mathField: MathField) => {
+    this.mathFieldRef = mathField;
   }
 
   public render() {
@@ -119,12 +131,11 @@ export default class Entry extends Component<EntryProps, {}> {
     } else if (value === null) {
       valueRender = '[oops]';
     } else {
-      valueRender = typeOf(expressionItem.value) === 'Matrix'
+      valueRender = typeOf(value) === 'Matrix'
         // ? <MatrixRenderer matrix={value as Matrix} />
-        ? this.getMatrixTex(expressionItem.value as Matrix)
-        : string(expressionItem.value);
+        ? this.getMatrixTex(round(value, 5) as Matrix)
+        : string(round(value, 5));
     }
-    console.log(valueRender);
 
     return (
       <div className='entry'>
@@ -136,6 +147,14 @@ export default class Entry extends Component<EntryProps, {}> {
           onFocus={this.onFocus}
           ref={this.inputRef}
         />
+        {/* <EditableMathField
+          latex={this.state.latex} // latex value for the input field
+          onChange={(mathField) => {
+            // called everytime the input changes
+            this.setState({latex: mathField.latex()});
+          }}
+          mathquillDidMount={this.setMathFieldRef}
+        /> */}
         <div className='expression-value'>
           <MathJax>
             {'\\( ' + valueRender + ' \\)'}
