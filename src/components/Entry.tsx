@@ -1,9 +1,9 @@
 import { Matrix, round, string, typeOf } from 'mathjs';
-import React, { ChangeEvent, Component, createRef, KeyboardEvent, RefObject } from 'react';
+import React, { Component } from 'react';
 import './Entry.scss';
 import { ExpressionItem, VariableMap } from '../utils/types';
-import { MathJax } from 'better-react-mathjax';
-import { EditableMathField, MathField, MathFieldConfig } from 'react-mathquill';
+import { EditableMathField, MathField, MathFieldConfig, StaticMathField } from 'react-mathquill';
+import classNames from 'classnames';
 
 interface EntryProps {
   variableMap: VariableMap;
@@ -17,21 +17,32 @@ interface EntryProps {
 }
 
 interface EntryState {
-  currentText: string;
   latex: string;
+  entryIsFocused: boolean;
 }
 
 export default class Entry extends Component<EntryProps, EntryState> {
   private previousText: string = '';
-  private inputRef: RefObject<HTMLInputElement>;
   private mathFieldRef: MathField | null = null;
+
+  private mathConfig: MathFieldConfig = {
+    autoCommands: 'sqrt',
+    charsThatBreakOutOfSupSub: '+-',
+    handlers: {
+      deleteOutOf: (_dir: any, _mathField: MathField) => {
+        this.props.expressionDeleted(this.props.idx);
+      },
+      enter: (_mathField: MathField) => {
+        this.props.expressionEntered(this.props.idx);
+      }
+    },
+  };
 
   constructor(props: any) {
     super(props);
-    this.inputRef = createRef<HTMLInputElement>();
     this.state = {
-      currentText: this.props.expressionItem.text,
       latex: '',
+      entryIsFocused: this.props.isFocused,
     };
   }
 
@@ -45,12 +56,15 @@ export default class Entry extends Component<EntryProps, EntryState> {
     this.tryFocus();
   }
 
-  /** If `this.props.isFocused` is true, focuses input element. */
+  /** If `this.props.isFocused` is true, focuses input. */
   private tryFocus = () => {
-    const input = this.inputRef.current;
-    if (input && this.props.isFocused) {
-      input.focus();
+    let entryIsFocused = false;
+    if (this.props.isFocused) {
+      this.mathFieldRef?.focus();
+      entryIsFocused = true;
     }
+    if (entryIsFocused !== this.state.entryIsFocused)
+      this.setState({entryIsFocused});
   }
 
   /**
@@ -71,37 +85,6 @@ export default class Entry extends Component<EntryProps, EntryState> {
     if (!this.containsVar(currText, oldVar)) return oldVar;
   }
 
-  private onInput = (e: ChangeEvent<HTMLInputElement>) => {
-    const { idx, onExpressionChange, expressionItem } = this.props;
-    const text = e.currentTarget.value;
-    onExpressionChange(text, idx, this.shouldDeleteVar(text));
-    this.previousText = expressionItem.text;
-  }
-
-  private onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    const { expressionItem,
-            idx,
-            expressionEntered,
-            expressionDeleted, } = this.props;
-
-    switch (e.key) {
-      case 'Enter':
-        expressionEntered(idx);
-        break;
-      case 'Delete':
-      case 'Backspace':
-        if (!expressionItem.text) {
-          e.preventDefault(); // don't delete anything else
-          expressionDeleted(idx);
-        }
-        break;
-    }
-  }
-
-  private onFocus = () => {
-    this.props.setFocus(this.props.idx);
-  }
-
   private getMatrixTex(m: Matrix) {
     let res = '\\left[\\begin{array}';
     if (m.size().length === 1) {
@@ -115,6 +98,18 @@ export default class Entry extends Component<EntryProps, EntryState> {
     }
     res += '\\end{array}\\right]';
     return res;
+  }
+
+  private onMathChange = (mathField: MathField) => {
+    const { idx, onExpressionChange, expressionItem } = this.props;
+    const text = mathField.text();
+    onExpressionChange(text, idx, this.shouldDeleteVar(text));
+    this.previousText = expressionItem.text;
+    this.setState({ latex: mathField.latex() });
+  }
+
+  private onFocus = () => {
+    this.props.setFocus(this.props.idx);
   }
 
   private setMathFieldRef = (mathField: MathField) => {
@@ -138,27 +133,24 @@ export default class Entry extends Component<EntryProps, EntryState> {
     }
 
     return (
-      <div className='entry'>
-        <input
-          type='text'
-          value={expressionItem.text}
-          onInput={this.onInput}
-          onKeyDown={this.onKeyDown}
-          onFocus={this.onFocus}
-          ref={this.inputRef}
-        />
-        {/* <EditableMathField
+      <div
+        className={classNames(
+          'entry',
+          {'focused': this.state.entryIsFocused}
+        )}
+        onFocus={this.onFocus}
+        onClick={this.onFocus}
+      >
+        <EditableMathField
           latex={this.state.latex} // latex value for the input field
-          onChange={(mathField) => {
-            // called everytime the input changes
-            this.setState({latex: mathField.latex()});
-          }}
+          onChange={this.onMathChange}
           mathquillDidMount={this.setMathFieldRef}
-        /> */}
+          config={this.mathConfig}
+        />
         <div className='expression-value'>
-          <MathJax>
-            {'\\( ' + valueRender + ' \\)'}
-          </MathJax>
+          <StaticMathField>
+            {valueRender}
+          </StaticMathField>
         </div>
       </div>
     );
