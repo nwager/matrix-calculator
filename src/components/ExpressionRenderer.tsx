@@ -3,6 +3,7 @@ import './ExpressionRenderer.scss';
 import { ExpressionItem, Result, VariableMap } from '../utils/types';
 import { EMPTY_EXPRESSION, expressionsAreEqual, safeEvaluate } from '../utils/utils';
 import Entry from './Entry';
+import MatrixEditor from './MatrixEditor';
 
 interface ExpressionRendererState {
   expressionList: ExpressionItem[];
@@ -170,6 +171,7 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     return (
       <div className='entries-container'>
         {this.renderEntries()}
+        <MatrixEditor />
         <button type='button' onClick={() => console.log(this.state)}>Log State</button>
       </div>
     );
