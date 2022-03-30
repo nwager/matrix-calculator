@@ -9,6 +9,7 @@ interface ExpressionRendererState {
   expressionList: ExpressionItem[];
   variableMap: VariableMap;
   focusedExpression: number | null;
+  matrix?: any;
 }
 
 export default class ExpressionRenderer extends Component<{}, ExpressionRendererState> {
@@ -171,7 +172,10 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     return (
       <div className='entries-container'>
         {this.renderEntries()}
-        <MatrixEditor />
+        <MatrixEditor
+          variableMap={this.state.variableMap}
+          updateValue={(matrix) => this.setState({ matrix })}
+        />
         <button type='button' onClick={() => console.log(this.state)}>Log State</button>
       </div>
     );
