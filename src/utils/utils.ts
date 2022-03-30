@@ -55,3 +55,12 @@ export function safeEvaluate(expression: string, scope: VariableMap): Result | n
   }
   return val;
 }
+
+export function matrixToString(m: Matrix | number[][] | number[]): string {
+  if (typeOf(m) === 'Matrix') m = (m as Matrix).toArray();
+  m = m as number[][] | number[];
+  if (m.length === 0) return '[[]]';
+  if (!Array.isArray(m[0])) m = [m as number[]]; // convert to 2D if needed
+  m = m as number[][];
+  return `[${m.map(row => `[${row.map(x => x.toString()).join(',')}]`).join(',')}]`;
+}

@@ -6,7 +6,8 @@ import { VariableMap } from '../utils/types';
 
 interface MatrixEditorProps {
   variableMap: VariableMap;
-  updateValue: (m: Matrix) => void;
+  updateValue?: (m: Matrix) => void;
+  defaultMatrix?: Matrix;
 }
 
 interface MatrixState {
@@ -14,15 +15,17 @@ interface MatrixState {
   latex: string[][];
 }
 
-const defaultMatrix = sparse([[0,0],[0,0]]);
-const defaultLatex = (defaultMatrix.toArray() as number[][])
-                       .map(row => row.map(elt => elt.toString()));
+export const FALLBACK_MATRIX = sparse([[0,0],[0,0]]);
+function matrixToStrArray(m: Matrix): string[][] {
+  return (m.toArray() as number[][]).map(row => row.map(elt => elt.toString()));
+}
 
 export default function MatrixEditor(props: MatrixEditorProps) {
-  const { variableMap, updateValue } = props;
+  const { variableMap, updateValue, defaultMatrix } = props;
+  const startingMatrix = defaultMatrix ? defaultMatrix : FALLBACK_MATRIX;
   const [matrixState, setMatrixState] = useState<MatrixState>({
-    value: defaultMatrix,
-    latex: defaultLatex,
+    value: startingMatrix,
+    latex: matrixToStrArray(startingMatrix),
   });
   return (
     <div className='matrix-container'>
@@ -51,12 +54,12 @@ function onMatrixChange(row: number,
                         matrixState: MatrixState,
                         setMatrixState: (matrixState: MatrixState) => void,
                         scope: VariableMap,
-                        updateValue: (m: Matrix) => void): ((mathField: MathField) => void) {
+                        updateValue?: (m: Matrix) => void): ((mathField: MathField) => void) {
   return (mathField: MathField) => {
     const { value, latex } = matrixState;
     value.set([row, col], evaluate(mathField.text(), scope));
     latex[row][col] = mathField.latex();
-    updateValue(value);
+    updateValue?.(value);
     console.log(value.toArray());
     setMatrixState({ value, latex });
   };
@@ -72,7 +75,7 @@ function onMatrixChange(row: number,
 function renderRows(matrixState: MatrixState,
                     setMatrixState: (matrixState: MatrixState) => void,
                     scope: VariableMap,
-                    updateValue: (m: Matrix) => void) {
+                    updateValue?: (m: Matrix) => void) {
   return (matrixState.value.toArray() as number[][]).map((r, i) => {
     return <tr key={i}>{r.map((_c, j) => {
       return <td key={j}>

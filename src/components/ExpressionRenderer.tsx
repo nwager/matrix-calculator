@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import './ExpressionRenderer.scss';
 import { ExpressionItem, Result, VariableMap } from '../utils/types';
-import { EMPTY_EXPRESSION, expressionsAreEqual, safeEvaluate } from '../utils/utils';
+import { EMPTY_EXPRESSION, expressionsAreEqual, matrixToString, safeEvaluate } from '../utils/utils';
 import Entry from './Entry';
-import MatrixEditor from './MatrixEditor';
+import MatrixEditor, { FALLBACK_MATRIX } from './MatrixEditor';
+import { evaluate, Matrix, sparse, typeOf, zeros } from 'mathjs';
 
 interface ExpressionRendererState {
   expressionList: ExpressionItem[];
@@ -168,6 +169,20 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     });
   }
 
+  private addMatrix = () => {
+    const { expressionList } = this.state;
+    const newMatrix = FALLBACK_MATRIX;
+    const newMatrixText = matrixToString(newMatrix)
+    expressionList.push({
+      expression: newMatrixText,
+      value: newMatrix,
+      isVariable: false,
+      text: newMatrixText,
+    });
+    console.log(expressionList[expressionList.length-1]);
+    this.setState({ expressionList });
+  }
+
   public render() {
     return (
       <div className='entries-container'>
@@ -177,6 +192,7 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
           updateValue={(matrix) => this.setState({ matrix })}
         />
         <button type='button' onClick={() => console.log(this.state)}>Log State</button>
+        <button type='button' onClick={this.addMatrix}>Add Matrix</button>
       </div>
     );
   }
