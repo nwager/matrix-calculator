@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/matrix-calculator/static/css/main.d768e235.css",
-    "main.js": "/matrix-calculator/static/js/main.017b7519.js",
+    "main.css": "/matrix-calculator/static/css/main.48ed5e99.css",
+    "main.js": "/matrix-calculator/static/js/main.33fb2e46.js",
     "static/js/787.3bbcf017.chunk.js": "/matrix-calculator/static/js/787.3bbcf017.chunk.js",
     "index.html": "/matrix-calculator/index.html",
-    "main.d768e235.css.map": "/matrix-calculator/static/css/main.d768e235.css.map",
-    "main.017b7519.js.map": "/matrix-calculator/static/js/main.017b7519.js.map",
+    "main.48ed5e99.css.map": "/matrix-calculator/static/css/main.48ed5e99.css.map",
+    "main.33fb2e46.js.map": "/matrix-calculator/static/js/main.33fb2e46.js.map",
     "787.3bbcf017.chunk.js.map": "/matrix-calculator/static/js/787.3bbcf017.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d768e235.css",
-    "static/js/main.017b7519.js"
+    "static/css/main.48ed5e99.css",
+    "static/js/main.33fb2e46.js"
   ]
 }
