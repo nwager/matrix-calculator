@@ -37,6 +37,15 @@ export default function MatrixEditor(props: MatrixEditorProps) {
   );
 }
 
+/**
+ * Called when a field of the matrix is changed. Updates that element in matrix state.
+ * @param row Row of element to update.
+ * @param col Column of element to update.
+ * @param matrixState The current matrix value and latex strings.
+ * @param setMatrixState Callback function to set the new matrix state.
+ * @param scope The current variables held by the calculator.
+ * @param updateValue Callback to update the parent matrix value.
+ */
 function onMatrixChange(row: number,
                         col: number,
                         matrixState: MatrixState,
@@ -53,6 +62,13 @@ function onMatrixChange(row: number,
   };
 }
 
+/**
+ * Renders a 2x2 table of editable math fields to represent a matrix.
+ * @param matrixState The current matrix value and latex strings.
+ * @param setMatrixState Callback function to set the new matrix state.
+ * @param scope The current variables held by the calculator.
+ * @param updateValue Callback to update the parent matrix value.
+ */
 function renderRows(matrixState: MatrixState,
                     setMatrixState: (matrixState: MatrixState) => void,
                     scope: VariableMap,
