@@ -56,8 +56,9 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     let value: Result | null;
     let isVariable = false;
     const [exp, val] = text.split('=', 2).map(s => s.trim());
-    if (exp && val) {
+    if (exp && val !== undefined) {
       // variable assignment
+      // null if variable is defined in terms of itself
       value = val.includes(exp) ? null : safeEvaluate(val, variableMap);
       isVariable = true;
     } else {

@@ -56,10 +56,9 @@ function onChange(oldItem: ExpressionItem, mathField: MathField,
   setCurrTex(mathField.latex());
   const text = mathField.text();
   const splitText = text.split('=');
-  // FIXME
+  // if item goes from var assignment to not var assignment, delete var
   if (oldItem.isVariable &&
       (splitText.length === 1 || splitText[0].trim() === '')) {
-    console.log(oldItem.expression);
     props.onDeleteVariable(oldItem.expression);
   }
   props.onExpressionChange(text, props.idx, false);
