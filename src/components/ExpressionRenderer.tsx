@@ -93,6 +93,8 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
       // if updated variable assignment, update map
       const currExp = this.state.expressionList[i];
       if (newExp.isVariable && !expressionsAreEqual(currExp, newExp)) {
+        if (newExp.expression !== currExp.expression)
+          updatedMap.delete(currExp.expression)
         updatedMap.set(newExp.expression, newExp.value)
         varsHaveChanged = true;
       }

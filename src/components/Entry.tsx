@@ -1,3 +1,4 @@
+import './Entry.scss';
 import { GenericEntryProps } from '../utils/types';
 import { MatrixEntry } from './MatrixEntry';
 import { TextEntry } from './TextEntry';
@@ -11,15 +12,9 @@ interface EntryProps extends GenericEntryProps {
  * @param props
  */
 export default function Entry(props: EntryProps) {
-  const { idx,
-          variableMap,
-          expressionItem,
-          isFocused,
-          setFocus,
-          onExpressionChange,
-          onEnterNewExpression,
-          onDeleteExpression,
-          onDeleteVariable } = props;
+  const { idx, variableMap, expressionItem, isFocused,
+          setFocus, onExpressionChange, onEnterNewExpression,
+          onDeleteExpression, onDeleteVariable } = props;
   return (
     expressionItem.isMatrixEntry ?
     <MatrixEntry
