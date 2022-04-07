@@ -1,11 +1,15 @@
 import { EditableMathField, StaticMathField } from 'react-mathquill';
-import { EntryProps } from '../utils/types';
+import { GenericEntryProps } from '../utils/types';
 import MatrixEditor from './MatrixEditor';
 
-interface MatrixEntryProps extends EntryProps {
+interface MatrixEntryProps extends GenericEntryProps {
 
 }
 
+/**
+ * Matrix variable definition with a matrix editor.
+ * @param props 
+ */
 export function MatrixEntry(props: MatrixEntryProps) {
   const { variableMap } = props;
   const valueRender = '';
