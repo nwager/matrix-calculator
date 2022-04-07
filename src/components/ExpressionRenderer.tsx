@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import './ExpressionRenderer.scss';
 import { ExpressionItem, Result, VariableMap } from '../utils/types';
 import { EMPTY_EXPRESSION, expressionsAreEqual, matrixToString, safeEvaluate } from '../utils/utils';
 import Entry from './Entry';
 import MatrixEditor, { FALLBACK_MATRIX } from './MatrixEditor';
-import { evaluate, Matrix, sparse, typeOf, zeros } from 'mathjs';
 
 interface ExpressionRendererState {
   expressionList: ExpressionItem[];
@@ -24,8 +23,8 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
   }
 
   /**
-   * Update the expression item at the given index. Optionally, delete a
-   * variable from the variable map.
+   * Update the expression item at the given index, or all items.
+   * Optionally, delete a variable from the variable map.
    * @param update The new expression item to replace the current one,
    *               or an array of updates for every expression.
    * @param idx The index of expression item(s) to update. If updating
@@ -170,16 +169,18 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
   }
 
   private addMatrix = () => {
-    const { expressionList } = this.state;
+    const { expressionList, variableMap } = this.state;
     const newMatrix = FALLBACK_MATRIX;
     const newMatrixText = matrixToString(newMatrix)
+    let varNum = 0;
+    while (variableMap.has(`M_(${varNum})`)) varNum++;
     expressionList.push({
-      expression: newMatrixText,
+      expression: `M_(${varNum})`,
       value: newMatrix,
-      isVariable: false,
-      text: newMatrixText,
+      isVariable: true,
+      text: `M_(${varNum})=` + newMatrixText,
+      isMatrixEntry: true,
     });
-    console.log(expressionList[expressionList.length-1]);
     this.setState({ expressionList });
   }
 

@@ -1,5 +1,4 @@
 import { Matrix } from 'mathjs';
-import React from 'react';
 import './MatrixRenderer.scss';
 
 interface MatrixRendererProps {

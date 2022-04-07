@@ -1,11 +1,12 @@
 import { Matrix, round, string, typeOf } from 'mathjs';
-import React, { Component } from 'react';
-import './Entry.scss';
+import { Component } from 'react';
+import './EntryContainer.scss';
 import { ExpressionItem, VariableMap } from '../utils/types';
 import { EditableMathField, MathField, MathFieldConfig, StaticMathField } from 'react-mathquill';
 import classNames from 'classnames';
+import { getMatrixTex } from '../utils/utils';
 
-interface EntryProps {
+export interface EntryContainerProps {
   variableMap: VariableMap;
   expressionItem: ExpressionItem;
   idx: number;
@@ -16,12 +17,12 @@ interface EntryProps {
   expressionDeleted: (idx: number) => void;
 }
 
-interface EntryState {
+interface EntryContainerState {
   latex: string;
   entryIsFocused: boolean;
 }
 
-export default class Entry extends Component<EntryProps, EntryState> {
+export default class EntryContainer extends Component<EntryContainerProps, EntryContainerState> {
   private previousText: string = '';
   private mathFieldRef: MathField | null = null;
 
@@ -85,21 +86,6 @@ export default class Entry extends Component<EntryProps, EntryState> {
     if (!this.containsVar(currText, oldVar)) return oldVar;
   }
 
-  private getMatrixTex(m: Matrix) {
-    let res = '\\left[\\begin{array}';
-    if (m.size().length === 1) {
-      res += '{' + 'c'.repeat(m.size()[0]) + '}';
-      res += m.toArray().map(x => x.toString()).join('&')
-    } else {
-      res += '{' + 'c'.repeat(m.size()[1]) + '}';
-      res += m.toArray().map(
-        r => (r as number[]).map(x => x.toString()).join('&')
-      ).join('\\\\');
-    }
-    res += '\\end{array}\\right]';
-    return res;
-  }
-
   private onMathChange = (mathField: MathField) => {
     const { idx, onExpressionChange, expressionItem } = this.props;
     const text = mathField.text();
@@ -127,8 +113,7 @@ export default class Entry extends Component<EntryProps, EntryState> {
       valueRender = '[oops]';
     } else {
       valueRender = typeOf(value) === 'Matrix'
-        // ? <MatrixRenderer matrix={value as Matrix} />
-        ? this.getMatrixTex(round(value, 5) as Matrix)
+        ? getMatrixTex(round(value, 5) as Matrix)
         : string(round(value, 5));
     }
 

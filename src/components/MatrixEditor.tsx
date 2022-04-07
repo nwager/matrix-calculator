@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './MatrixEditor.scss';
 import { EditableMathField, MathField } from 'react-mathquill';
 import { evaluate, Matrix, sparse } from 'mathjs';
@@ -60,7 +60,6 @@ function onMatrixChange(row: number,
     value.set([row, col], evaluate(mathField.text(), scope));
     latex[row][col] = mathField.latex();
     updateValue?.(value);
-    console.log(value.toArray());
     setMatrixState({ value, latex });
   };
 }

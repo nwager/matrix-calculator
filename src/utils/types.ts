@@ -8,6 +8,15 @@ export interface ExpressionItem {
   value: Result | null;
   isVariable: boolean;
   text: string;
+  isMatrixEntry?: boolean;
+}
+
+/** Common props needed by all entry types. */
+export interface EntryProps {
+  variableMap: VariableMap;
+  onEnterNewExpression: () => void;
+  onDeleteVariable: (deleteVar: string) => void;
+  onDeleteExpression: () => void;
 }
 
 export default {};

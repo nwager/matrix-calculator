@@ -62,5 +62,22 @@ export function matrixToString(m: Matrix | number[][] | number[]): string {
   if (m.length === 0) return '[[]]';
   if (!Array.isArray(m[0])) m = [m as number[]]; // convert to 2D if needed
   m = m as number[][];
-  return `[${m.map(row => `[${row.map(x => x.toString()).join(',')}]`).join(',')}]`;
+  return '[' 
+    + m.map(row => `[${row.map(x => x.toString()).join(',')}]`).join(',')
+    + ']';
+}
+
+export function getMatrixTex(m: Matrix) {
+  let res = '\\left[\\begin{array}';
+  if (m.size().length === 1) {
+    res += '{' + 'c'.repeat(m.size()[0]) + '}';
+    res += m.toArray().map(x => x.toString()).join('&')
+  } else {
+    res += '{' + 'c'.repeat(m.size()[1]) + '}';
+    res += m.toArray().map(
+      r => (r as number[]).map(x => x.toString()).join('&')
+    ).join('\\\\');
+  }
+  res += '\\end{array}\\right]';
+  return res;
 }

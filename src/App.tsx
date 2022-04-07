@@ -1,4 +1,3 @@
-import React from 'react';
 import { addStyles } from 'react-mathquill';
 import './App.scss';
 import ExpressionRenderer from './components/ExpressionRenderer';
