@@ -1,37 +1,40 @@
 import { useState } from 'react';
 import './MatrixEditor.scss';
 import { EditableMathField, MathField } from 'react-mathquill';
-import { evaluate, Matrix, sparse } from 'mathjs';
+import { Matrix } from 'mathjs';
 import { VariableMap } from '../utils/types';
+import { defaultMathFieldConfig, FALLBACK_MATRIX, safeEvaluate, str } from '../utils/utils';
 
 interface MatrixEditorProps {
   variableMap: VariableMap;
-  updateValue?: (m: Matrix) => void;
+  onChange?: (m: Matrix | null) => void;
   defaultMatrix?: Matrix;
 }
 
 interface MatrixState {
   value: Matrix;
   latex: string[][];
+  nullElts: boolean[][];
 }
 
-export const FALLBACK_MATRIX = sparse([[0,0],[0,0]]);
 function matrixToStrArray(m: Matrix): string[][] {
-  return (m.toArray() as number[][]).map(row => row.map(elt => elt.toString()));
+  return (m.toArray() as number[][]).map(row => row.map(elt => str(elt)));
 }
 
 export default function MatrixEditor(props: MatrixEditorProps) {
-  const { variableMap, updateValue, defaultMatrix } = props;
-  const startingMatrix = defaultMatrix ? defaultMatrix : FALLBACK_MATRIX;
+  const { variableMap, onChange, defaultMatrix } = props;
+  const startingMatrix = defaultMatrix ? defaultMatrix : FALLBACK_MATRIX();
+  const strArray = matrixToStrArray(startingMatrix);
   const [matrixState, setMatrixState] = useState<MatrixState>({
     value: startingMatrix,
-    latex: matrixToStrArray(startingMatrix),
+    latex: strArray,
+    nullElts: strArray.map(r => r.map(() => false)),
   });
   return (
-    <div className='matrix-container'>
+    <div className='matrix-editor-container'>
       <table className='matrix-table'>
         <tbody>
-          {renderRows(matrixState, setMatrixState, variableMap, updateValue)}
+          {renderRows(matrixState, setMatrixState, variableMap, onChange)}
         </tbody>
       </table>
       <div className='bracket left-bracket' />
@@ -54,13 +57,19 @@ function onMatrixChange(row: number,
                         matrixState: MatrixState,
                         setMatrixState: (matrixState: MatrixState) => void,
                         scope: VariableMap,
-                        updateValue?: (m: Matrix) => void): ((mathField: MathField) => void) {
+                        onChange?: (m: Matrix | null) => void): ((mathField: MathField) => void) {
   return (mathField: MathField) => {
-    const { value, latex } = matrixState;
-    value.set([row, col], evaluate(mathField.text(), scope));
+    const { value, latex, nullElts } = matrixState;
+    const newValue = safeEvaluate(mathField.text(), scope);
+
+    nullElts[row][col] = newValue === null;
+    value.set([row, col], newValue === null ? 0 : newValue);
     latex[row][col] = mathField.latex();
-    updateValue?.(value);
-    setMatrixState({ value, latex });
+
+    const hasNull = nullElts.some(r => r.some(x => x))
+    onChange?.(hasNull ? null : value);
+  
+    setMatrixState({ value, latex, nullElts });
   };
 }
 
@@ -74,13 +83,14 @@ function onMatrixChange(row: number,
 function renderRows(matrixState: MatrixState,
                     setMatrixState: (matrixState: MatrixState) => void,
                     scope: VariableMap,
-                    updateValue?: (m: Matrix) => void) {
+                    onChange?: (m: Matrix | null) => void) {
   return (matrixState.value.toArray() as number[][]).map((r, i) => {
     return <tr key={i}>{r.map((_c, j) => {
       return <td key={j}>
         <EditableMathField
           latex={matrixState.latex[i][j]}
-          onChange={onMatrixChange(i, j, matrixState, setMatrixState, scope, updateValue)}
+          onChange={onMatrixChange(i, j, matrixState, setMatrixState, scope, onChange)}
+          config={defaultMathFieldConfig}
         />
       </td>
     })}</tr>

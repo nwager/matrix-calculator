@@ -1,5 +1,5 @@
 import './Entry.scss';
-import { GenericEntryProps } from '../utils/types';
+import { GenericEntryProps } from '../../utils/types';
 import { MatrixEntry } from './MatrixEntry';
 import { TextEntry } from './TextEntry';
 
@@ -16,7 +16,7 @@ export default function Entry(props: EntryProps) {
           setFocus, onExpressionChange, onEnterNewExpression,
           onDeleteExpression, onDeleteVariable } = props;
   return (
-    expressionItem.isMatrixEntry ?
+    expressionItem.isMatrix ?
     <MatrixEntry
       idx={idx}
       variableMap={variableMap}

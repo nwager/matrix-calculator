@@ -12,8 +12,8 @@ export interface ExpressionItem {
   expression: string;
   value: Result | null;
   isVariable: boolean;
+  isMatrix: boolean;
   text: string;
-  isMatrixEntry?: boolean;
 }
 
 /** Common props needed by all entry types. */
@@ -23,8 +23,7 @@ export interface GenericEntryProps {
   expressionItem: ExpressionItem;
   isFocused: boolean;
   setFocus: (idx: number) => void;
-  onExpressionChange: (text: string, idx: number,
-                       isMatrixEntry?: boolean) => void;
+  onExpressionChange: (text: string, idx: number) => void;
   onEnterNewExpression: (idx: number) => void;
   onDeleteVariable: (deleteVar: string) => void;
   onDeleteExpression: (idx: number) => void;

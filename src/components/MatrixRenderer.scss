@@ -1,36 +1,7 @@
 @import '../style/variables.scss';
+@import './MatrixEditor.scss';
 
-.matrix-container {
-  $bracket-width: 0.15em;
-  $bracket-end-length: 0.3em;
-
-  padding: 0 0.2em;
-  position: relative;
-  color: $text-color;
-  font-family:'Times New Roman', Times, serif;
-  font-size: 0.8em;
-  
-  .bracket {
-    $bracket-border-style: $bracket-width solid $text-color;
-    border-top: $bracket-border-style;
-    border-bottom: $bracket-border-style;
-    position: absolute;
-    top: -$bracket-width;
-    bottom: -$bracket-width;
-    width: $bracket-end-length;
-
-    &.left-bracket {
-      left: -$bracket-width;
-      border-left: $bracket-border-style;
-    }
-
-    &.right-bracket {
-      right: -$bracket-width;
-      border-right: $bracket-border-style;
-    }
-  }
-
-  td {
-    padding: 0.1em 0.3em;
-  }
+.matrix-renderer-container {
+  @extend .matrix-editor-container;
+  margin-right: 0;
 }

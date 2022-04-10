@@ -1,15 +1,13 @@
 import { Component } from 'react';
 import './ExpressionRenderer.scss';
 import { ExpressionItem, Result, VariableMap } from '../utils/types';
-import { EMPTY_EXPRESSION, expressionsAreEqual, matrixToString, safeEvaluate } from '../utils/utils';
-import MatrixEditor, { FALLBACK_MATRIX } from './MatrixEditor';
-import Entry from './Entry';
+import { EMPTY_EXPRESSION, expressionsAreEqual, FALLBACK_MATRIX, matrixToString, safeEvaluate } from '../utils/utils';
+import Entry from './entries/Entry';
 
 interface ExpressionRendererState {
   expressionList: ExpressionItem[];
   variableMap: VariableMap;
   focusedExpression: number | null;
-  matrix?: any;
 }
 
 export default class ExpressionRenderer extends Component<{}, ExpressionRendererState> {
@@ -28,8 +26,9 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
    * @param text Mathematical expression to evaluate.
    * @param idx Index of expression item being evaluated.
    */
-  private reevaluate = (text: string, idx: number, isMatrixEntry?: boolean) => {
-    const expressionUpdate = this.getExpressionFromText(text, isMatrixEntry);
+  private reevaluate = (text: string, idx: number) => {
+    const { isMatrix } = this.state.expressionList[idx];
+    const expressionUpdate = this.getExpressionFromText(text, isMatrix);
     this.updateExpressionItem({ item: expressionUpdate, idx});
   }
 
@@ -38,7 +37,7 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
    */
   private reevaluateAll = () => {
     const updates = this.state.expressionList.map(
-      e => this.getExpressionFromText(e.text)
+      e => this.getExpressionFromText(e.text, e.isMatrix)
     );
     this.updateExpressionItem(updates);
   }
@@ -46,11 +45,8 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
   /**
    * Return a new ExpressionItem from the passed in string
    * @param text The expression to evaluate.
-   * @param isMatrixEntry Optional.
    */
-  private getExpressionFromText = (
-    text: string, isMatrixEntry?: boolean
-  ): ExpressionItem => {
+  private getExpressionFromText = (text: string, isMatrix: boolean): ExpressionItem => {
 
     const { variableMap } = this.state;
     let value: Result | null;
@@ -66,7 +62,7 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
       value = safeEvaluate(exp, variableMap);
     }
     return {
-      expression: exp, value, isVariable, text, isMatrixEntry
+      expression: exp, value, isVariable, isMatrix, text
     };
   }
 
@@ -113,10 +109,8 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     });
   }
 
-  private onExpressionChange = (text: string,
-                                idx: number,
-                                isMatrixEntry?: boolean) => {
-    this.reevaluate(text, idx, isMatrixEntry);
+  private onExpressionChange = (text: string, idx: number) => {
+    this.reevaluate(text, idx);
   }
 
   private onEnterNewExpression = (idx: number) => {
@@ -186,16 +180,19 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
    */
   private addMatrix = () => {
     const { expressionList, variableMap } = this.state;
+    const newMatrix = FALLBACK_MATRIX();
     // generate a new variable name "M_#" for the matrix
     let varNum = 0;
-    while (variableMap.has(`M_(${varNum})`)) varNum++;
+    while (variableMap.has(`M_{${varNum}}`)) varNum++;
+    const varName = `M_{${varNum}}`;
     expressionList.push({
-      expression: `M_(${varNum})`,
-      value: FALLBACK_MATRIX,
+      expression: varName,
+      value: newMatrix,
       isVariable: true,
-      text: `M_(${varNum})=${matrixToString(FALLBACK_MATRIX)}`,
-      isMatrixEntry: true,
+      text: `M_{${varNum}}=${matrixToString(newMatrix)}`,
+      isMatrix: true,
     });
+    variableMap.set(varName, newMatrix);
     this.setState({ expressionList });
   }
 
@@ -203,12 +200,8 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     return (
       <div className='entries-container'>
         {this.renderEntries()}
-        <MatrixEditor
-          variableMap={this.state.variableMap}
-          updateValue={(matrix) => this.setState({ matrix })}
-        />
-        <button type='button' onClick={() => console.log(this.state)}>Log State</button>
         <button type='button' onClick={this.addMatrix}>Add Matrix</button>
+        <button type='button' onClick={() => console.log(this.state)}>Log State</button>
       </div>
     );
   }
