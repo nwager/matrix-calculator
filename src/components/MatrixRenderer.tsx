@@ -23,10 +23,17 @@ export default function MatrixRenderer(props: MatrixRendererProps) {
 
 function renderRows(matrix: Matrix) {
   return (matrix.toArray() as number[][]).map((r, i) => {
-    return <tr key={i}>{r.map((c, j) => {
-      return <td key={j}>
-        <StaticMathField>{str(c)}</StaticMathField>
-      </td>
-    })}</tr>
+    return <tr key={i}>{
+      Array.isArray(r) ?
+        r.map((c, j) => {
+          return <td key={j}>
+            <StaticMathField>{str(c)}</StaticMathField>
+          </td>
+        })
+      :
+        <td key={i}>
+          <StaticMathField>{str(r)}</StaticMathField>
+        </td>
+    }</tr>
   });
 }

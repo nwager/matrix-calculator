@@ -183,13 +183,13 @@ export default class ExpressionRenderer extends Component<{}, ExpressionRenderer
     const newMatrix = FALLBACK_MATRIX();
     // generate a new variable name "M_#" for the matrix
     let varNum = 0;
-    while (variableMap.has(`M_{${varNum}}`)) varNum++;
-    const varName = `M_{${varNum}}`;
+    while (variableMap.has(`M_${varNum}`)) varNum++;
+    const varName = `M_${varNum}`;
     expressionList.push({
       expression: varName,
       value: newMatrix,
       isVariable: true,
-      text: `M_{${varNum}}=${matrixToString(newMatrix)}`,
+      text: `${varName}=${matrixToString(newMatrix)}`,
       isMatrix: true,
     });
     variableMap.set(varName, newMatrix);

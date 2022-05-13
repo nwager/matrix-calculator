@@ -3,7 +3,8 @@ import { Matrix } from 'mathjs';
 import { useRef, useState } from 'react';
 import { EditableMathField, MathField, StaticMathField } from 'react-mathquill';
 import { ExpressionItem, GenericEntryProps } from '../../utils/types';
-import { defaultMathFieldConfig, getMatrixTex, isMatrix, str } from '../../utils/utils';
+import { defaultMathFieldConfig, isMatrix, str } from '../../utils/utils';
+import MatrixRenderer from '../MatrixRenderer';
 
 interface TextEntryProps extends GenericEntryProps {
   
@@ -21,11 +22,11 @@ export function TextEntry(props: TextEntryProps) {
   const mf = useRef<MathField>();
   const [currTex, setCurrTex] = useState('');
 
-  let valueRender = '[null]';
+  let valueRender = <StaticMathField>{'[null]'}</StaticMathField>;
   if (value !== null) {
     valueRender = isMatrix(value)
-      ? getMatrixTex(value as Matrix)
-      : str(value);
+      ? <MatrixRenderer matrix={value as Matrix} />
+      : <StaticMathField>{str(value)}</StaticMathField>;
   }
 
   const onChangeCb = function(mathField: MathField) {
@@ -44,11 +45,11 @@ export function TextEntry(props: TextEntryProps) {
             deleteOutOf: (_, mathField) => {
               if (!mathField.text()) onDeleteExpression(idx)
             },
-            enter: () => onEnterNewExpression(idx)
+            enter: () => onEnterNewExpression(idx),
           }
         }}
       />
-      <StaticMathField>{valueRender}</StaticMathField>
+      {valueRender}
     </div>
   );
 }
@@ -65,4 +66,3 @@ function onChange(oldItem: ExpressionItem, mathField: MathField,
   }
   props.onExpressionChange(text, props.idx);
 }
-

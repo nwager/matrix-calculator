@@ -40,8 +40,11 @@ export const str = (o: any) => '' + o;
  * @param {VariableMap} scope Map of variable names to values, used as `scope` arg
  * @returns Either a scalar or matrix if expression is valid, else null
  */
-export function safeEvaluate(expression: string, scope: VariableMap): Result | null {
+export function safeEvaluate(expression: string,
+                             scope: VariableMap,
+                             allowBracketMatrix = true): Result | null {
   if (!expression) return null;
+  if (!allowBracketMatrix && expression.match(/[[\]]/)) return null;
   let val: Result | null = null;
   try {
     val = evaluate(expression, scope);

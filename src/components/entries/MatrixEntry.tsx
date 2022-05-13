@@ -31,7 +31,8 @@ export function MatrixEntry(props: MatrixEntryProps) {
       <MatrixEditor
         variableMap={variableMap}
         onChange={(matrix) => onExpressionChange(
-            expressionItem.expression + '=' + (matrix ? matrixToString(matrix) : 'null'),
+            expressionItem.expression + '='
+              + (matrix ? matrixToString(matrix) : 'null'),
             idx
           )
         }
